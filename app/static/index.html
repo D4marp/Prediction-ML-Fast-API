@@ -443,10 +443,16 @@ Authorization: Bearer {token}</pre>
                             <input type="password" id="regPassword" required placeholder="Min 8 karakter" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition">
                             <p class="text-xs text-gray-400 mt-1">Minimal 8 karakter, gunakan kombinasi huruf, angka, dan simbol</p>
                         </div>
-                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition flex items-center justify-center gap-2">
-                            <i class="fas fa-check-circle"></i>
-                            Daftar Sekarang
-                        </button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="fillRegisterExample()" class="bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 rounded-lg transition flex items-center justify-center gap-2 text-sm">
+                                <i class="fas fa-fill-drip"></i>
+                                Isi Contoh
+                            </button>
+                            <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition flex items-center justify-center gap-2">
+                                <i class="fas fa-check-circle"></i>
+                                Daftar
+                            </button>
+                        </div>
                     </form>
 
                     <div class="mt-4 p-4 bg-purple-900 border border-purple-700 rounded-lg">
@@ -506,11 +512,12 @@ Authorization: Bearer {token}</pre>
 
                 <div id="getUserAlert" class="mb-4 p-4 rounded-lg hidden"></div>
 
-                <form id="getUserForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <form id="getUserForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-gray-300 text-sm font-medium mb-2">Username</label>
                         <input type="text" id="getUsername" required placeholder="username" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 transition">
                     </div>
+                    <button type="button" onclick="fillGetUserExample()" class="md:mt-8 bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 rounded-lg transition text-sm">Isi Contoh</button>
                     <button type="submit" class="md:mt-8 bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg transition">Get User</button>
                 </form>
 
@@ -555,7 +562,10 @@ Authorization: Bearer {token}</pre>
                                 <input type="checkbox" id="itemAvailable" checked class="w-4 h-4 text-purple-600 rounded">
                                 <label for="itemAvailable" class="ml-2 text-gray-300">Available</label>
                             </div>
-                            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition">Create Item</button>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" onclick="fillCreateItemExample()" class="bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 rounded-lg transition text-sm">Isi Contoh</button>
+                                <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition">Create Item</button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -603,7 +613,8 @@ Authorization: Bearer {token}</pre>
                                     <input type="number" id="updateItemPrice" placeholder="Leave empty to keep" step="0.01" min="0" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition">
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-3 gap-4">
+                                <button type="button" onclick="fillUpdateItemExample()" class="bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 rounded-lg transition text-sm">Isi Contoh</button>
                                 <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 rounded-lg transition">Update Item</button>
                                 <button type="button" onclick="deleteItem()" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-lg transition">Delete Item</button>
                             </div>
@@ -642,7 +653,10 @@ Authorization: Bearer {token}</pre>
                             <label class="block text-gray-300 text-sm font-medium mb-2">Features (comma-separated)</label>
                             <textarea id="predictionFeatures" required placeholder="e.g., 50.0, 100.0, 25.5" rows="4" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 transition font-mono text-sm"></textarea>
                         </div>
-                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg transition">Predict Sales</button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="fillPredictionExample()" class="bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 rounded-lg transition text-sm">Isi Contoh</button>
+                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg transition">Predict Sales</button>
+                        </div>
                     </form>
                 </div>
 
@@ -727,6 +741,38 @@ Authorization: Bearer {token}</pre>
             document.getElementById('loginPassword').value = password;
             document.getElementById('loginUsername').focus();
             showToast(`Form terisi dengan akun: ${username}`, 'success');
+        }
+
+        function fillRegisterExample() {
+            document.getElementById('regUsername').value = 'ahmad_kusuma';
+            document.getElementById('regEmail').value = 'ahmad.kusuma@example.com';
+            document.getElementById('regFullName').value = 'Ahmad Kusuma';
+            document.getElementById('regPassword').value = 'SecurePass2024!';
+            showToast('Form terisi dengan contoh data', 'success');
+        }
+
+        function fillGetUserExample() {
+            document.getElementById('getUsername').value = 'john_doe';
+            showToast('Username terisi: john_doe', 'success');
+        }
+
+        function fillCreateItemExample() {
+            document.getElementById('itemName').value = 'iPhone 15 Pro Max';
+            document.getElementById('itemDescription').value = 'Smartphone premium terbaru dengan chipset A17 Pro';
+            document.getElementById('itemPrice').value = '16999999.99';
+            document.getElementById('itemAvailable').checked = true;
+            showToast('Form item terisi dengan contoh', 'success');
+        }
+
+        function fillUpdateItemExample() {
+            document.getElementById('updateItemName').value = 'iPhone 15 Pro Max - Updated';
+            document.getElementById('updateItemPrice').value = '15999999.99';
+            showToast('Form update terisi dengan contoh', 'success');
+        }
+
+        function fillPredictionExample() {
+            document.getElementById('predictionFeatures').value = '50.0, 100.0, 25.5, 75.2, 120.8';
+            showToast('Features terisi dengan contoh data', 'success');
         }
 
         async function handleRegister(e) {
