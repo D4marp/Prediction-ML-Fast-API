@@ -708,12 +708,17 @@ Authorization: Bearer {token}</pre>
     <div id="toast" class="fixed bottom-4 right-4 hidden"></div>
 
     <script>
-        const API_BASE = 'http://localhost:8000';
-        let currentToken = localStorage.getItem('access_token') || null;
-        let currentUser = localStorage.getItem('username') || null;
+        const API_BASE = 'http://127.0.0.1:8000';
+        let currentToken = null;
+        let currentUser = null;
 
-        // Initialize
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
+            // Load token and user from localStorage
+            currentToken = localStorage.getItem('access_token');
+            currentUser = localStorage.getItem('username');
+            console.log('Loaded from localStorage - Token:', currentToken ? 'Present' : 'Not found', 'User:', currentUser);
+            
             showPage('dashboard');
             updateUserDisplay();
             if (currentToken) {
@@ -788,6 +793,7 @@ Authorization: Bearer {token}</pre>
 
             try {
                 showAlertMessage(alert, 'Loading...', 'info');
+                console.log('Registering user:', data.username);
                 const response = await fetch(`${API_BASE}/users/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -795,16 +801,18 @@ Authorization: Bearer {token}</pre>
                 });
 
                 const result = await response.json();
+                console.log('Register response:', response.status, result);
                 
                 if (response.ok) {
                     showAlertMessage(alert, `✅ User ${data.username} berhasil didaftarkan!`, 'success');
-                    showToast(`User ${data.username} registered`, 'success');
+                    showToast(`User ${data.username} registered. Silakan login.`, 'success');
                     document.getElementById('registerForm').reset();
                 } else {
                     showAlertMessage(alert, `❌ ${result.detail || 'Error'}`, 'error');
                     showToast('Registration failed', 'error');
                 }
             } catch (error) {
+                console.error('Register error:', error);
                 showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
             }
         }
@@ -825,22 +833,31 @@ Authorization: Bearer {token}</pre>
                 });
 
                 const result = await response.json();
+                console.log('Login response:', response.status, result);
                 
                 if (response.ok) {
                     currentToken = result.access_token;
                     currentUser = document.getElementById('loginUsername').value;
+                    
+                    // Store in localStorage
                     localStorage.setItem('access_token', currentToken);
                     localStorage.setItem('username', currentUser);
+                    console.log('Token saved to localStorage:', currentToken);
+                    
                     displayToken(currentToken);
                     updateUserDisplay();
                     showAlertMessage(alert, '✅ Login berhasil!', 'success');
                     showToast(`Welcome ${currentUser}!`, 'success');
                     document.getElementById('loginForm').reset();
+                    
+                    // Load items after successful login
+                    setTimeout(() => getItems(), 500);
                 } else {
                     showAlertMessage(alert, `❌ ${result.detail || 'Login gagal'}`, 'error');
                     showToast('Login failed', 'error');
                 }
             } catch (error) {
+                console.error('Login error:', error);
                 showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
             }
         }
@@ -875,6 +892,12 @@ Authorization: Bearer {token}</pre>
             e.preventDefault();
             const alert = document.getElementById('createItemAlert');
             
+            if (!currentToken) {
+                showAlertMessage(alert, '❌ Anda harus login terlebih dahulu!', 'error');
+                showToast('Login required', 'error');
+                return;
+            }
+            
             const data = {
                 name: document.getElementById('itemName').value,
                 description: document.getElementById('itemDescription').value,
@@ -884,11 +907,12 @@ Authorization: Bearer {token}</pre>
 
             try {
                 showAlertMessage(alert, 'Loading...', 'info');
-                const headers = { 'Content-Type': 'application/json' };
-                if (currentToken) {
-                    headers['Authorization'] = `Bearer ${currentToken}`;
-                }
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentToken}`
+                };
                 
+                console.log('Creating item with token:', currentToken);
                 const response = await fetch(`${API_BASE}/items/`, {
                     method: 'POST',
                     headers: headers,
@@ -896,6 +920,7 @@ Authorization: Bearer {token}</pre>
                 });
 
                 const result = await response.json();
+                console.log('Create item response:', response.status, result);
                 
                 if (response.ok) {
                     showAlertMessage(alert, `✅ Item "${data.name}" berhasil dibuat!`, 'success');
@@ -907,6 +932,7 @@ Authorization: Bearer {token}</pre>
                     showToast('Failed to create item', 'error');
                 }
             } catch (error) {
+                console.error('Create item error:', error);
                 showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
             }
         }
@@ -958,6 +984,12 @@ Authorization: Bearer {token}</pre>
             const alert = document.getElementById('updateItemAlert');
             const itemId = document.getElementById('updateItemId').value;
             
+            if (!currentToken) {
+                showAlertMessage(alert, '❌ Anda harus login terlebih dahulu!', 'error');
+                showToast('Login required', 'error');
+                return;
+            }
+            
             const data = {};
             if (document.getElementById('updateItemName').value) {
                 data.name = document.getElementById('updateItemName').value;
@@ -968,11 +1000,12 @@ Authorization: Bearer {token}</pre>
 
             try {
                 showAlertMessage(alert, 'Loading...', 'info');
-                const headers = { 'Content-Type': 'application/json' };
-                if (currentToken) {
-                    headers['Authorization'] = `Bearer ${currentToken}`;
-                }
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentToken}`
+                };
                 
+                console.log('Updating item with token:', currentToken);
                 const response = await fetch(`${API_BASE}/items/${itemId}`, {
                     method: 'PATCH',
                     headers: headers,
@@ -980,6 +1013,7 @@ Authorization: Bearer {token}</pre>
                 });
 
                 const result = await response.json();
+                console.log('Update item response:', response.status, result);
                 
                 if (response.ok) {
                     showAlertMessage(alert, '✅ Item berhasil diupdate!', 'success');
@@ -991,6 +1025,7 @@ Authorization: Bearer {token}</pre>
                     showToast('Failed to update item', 'error');
                 }
             } catch (error) {
+                console.error('Update item error:', error);
                 showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
             }
         }
@@ -1004,22 +1039,30 @@ Authorization: Bearer {token}</pre>
                 return;
             }
 
+            if (!currentToken) {
+                showAlertMessage(alert, '❌ Anda harus login terlebih dahulu!', 'error');
+                showToast('Login required', 'error');
+                return;
+            }
+
             if (!confirm('Anda yakin ingin menghapus item ini?')) {
                 return;
             }
 
             try {
                 showAlertMessage(alert, 'Loading...', 'info');
-                const headers = {};
-                if (currentToken) {
-                    headers['Authorization'] = `Bearer ${currentToken}`;
-                }
+                const headers = {
+                    'Authorization': `Bearer ${currentToken}`
+                };
                 
+                console.log('Deleting item with token:', currentToken);
                 const response = await fetch(`${API_BASE}/items/${itemId}`, {
                     method: 'DELETE',
                     headers: headers
                 });
 
+                console.log('Delete item response:', response.status);
+                
                 if (response.ok) {
                     showAlertMessage(alert, '✅ Item berhasil dihapus!', 'success');
                     showToast('Item deleted', 'success');
@@ -1031,6 +1074,7 @@ Authorization: Bearer {token}</pre>
                     showToast('Failed to delete item', 'error');
                 }
             } catch (error) {
+                console.error('Delete item error:', error);
                 showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
             }
         }
@@ -1057,6 +1101,7 @@ Authorization: Bearer {token}</pre>
 
             try {
                 showAlertMessage(alert, 'Loading...', 'info');
+                console.log('Making prediction with token:', currentToken);
                 const response = await fetch(`${API_BASE}/predict-sales/`, {
                     method: 'POST',
                     headers: {
@@ -1067,6 +1112,7 @@ Authorization: Bearer {token}</pre>
                 });
 
                 const result = await response.json();
+                console.log('Prediction response:', response.status, result);
                 
                 if (response.ok) {
                     showAlertMessage(alert, '✅ Prediksi berhasil!', 'success');
@@ -1079,6 +1125,7 @@ Authorization: Bearer {token}</pre>
                     showToast('Prediction failed', 'error');
                 }
             } catch (error) {
+                console.error('Prediction error:', error);
                 showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
             }
         }
@@ -1119,7 +1166,9 @@ Authorization: Bearer {token}</pre>
             currentUser = null;
             localStorage.removeItem('access_token');
             localStorage.removeItem('username');
+            console.log('User logged out, token cleared');
             updateUserDisplay();
+            document.getElementById('tokenDisplay').classList.add('hidden');
             showPage('dashboard');
             showToast('Logged out successfully', 'success');
         }
