@@ -41,14 +41,12 @@ async def create_item_endpoint(
 @router.get("/", response_model=List[Item])
 async def get_items_endpoint(
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_active_user),
 ):
     """
-    Retrieve all items.
+    Retrieve all items (public endpoint).
 
     Args:
         db (Session): The database session.
-        current_user (dict): The currently authenticated user.
 
     Returns:
         List[Item]: A list of all items.
@@ -59,15 +57,13 @@ async def get_items_endpoint(
 async def get_item_by_id_endpoint(
     item_id: UUID,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_active_user),
 ):
     """
-    Retrieve an item by its ID.
+    Retrieve an item by its ID (public endpoint).
 
     Args:
         item_id (UUID): The ID of the item to retrieve.
         db (Session): The database session.
-        current_user (dict): The currently authenticated user.
 
     Returns:
         Item: The item with the specified ID.

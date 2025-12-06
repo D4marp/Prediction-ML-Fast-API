@@ -884,9 +884,14 @@ Authorization: Bearer {token}</pre>
 
             try {
                 showAlertMessage(alert, 'Loading...', 'info');
+                const headers = { 'Content-Type': 'application/json' };
+                if (currentToken) {
+                    headers['Authorization'] = `Bearer ${currentToken}`;
+                }
+                
                 const response = await fetch(`${API_BASE}/items/`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: headers,
                     body: JSON.stringify(data)
                 });
 
@@ -963,9 +968,14 @@ Authorization: Bearer {token}</pre>
 
             try {
                 showAlertMessage(alert, 'Loading...', 'info');
+                const headers = { 'Content-Type': 'application/json' };
+                if (currentToken) {
+                    headers['Authorization'] = `Bearer ${currentToken}`;
+                }
+                
                 const response = await fetch(`${API_BASE}/items/${itemId}`, {
                     method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: headers,
                     body: JSON.stringify(data)
                 });
 
@@ -1000,8 +1010,14 @@ Authorization: Bearer {token}</pre>
 
             try {
                 showAlertMessage(alert, 'Loading...', 'info');
+                const headers = {};
+                if (currentToken) {
+                    headers['Authorization'] = `Bearer ${currentToken}`;
+                }
+                
                 const response = await fetch(`${API_BASE}/items/${itemId}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: headers
                 });
 
                 if (response.ok) {
