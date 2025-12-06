@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Application</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .slide-up { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-slate-800 border-b border-purple-500 shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-rocket text-purple-400 text-2xl"></i>
+                    <span class="text-white font-bold text-xl">FastAPI</span>
+                </div>
+                <div class="hidden md:flex gap-1">
+                    <button onclick="showPage('dashboard')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-slate-700 transition">
+                        <i class="fas fa-home mr-2"></i>Dashboard
+                    </button>
+                    <button onclick="showPage('auth')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-slate-700 transition">
+                        <i class="fas fa-lock mr-2"></i>Auth
+                    </button>
+                    <button onclick="showPage('items')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-slate-700 transition">
+                        <i class="fas fa-box mr-2"></i>Items
+                    </button>
+                    <button onclick="showPage('predict')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-slate-700 transition">
+                        <i class="fas fa-chart-line mr-2"></i>Predict
+                    </button>
+                </div>
+                <div class="text-right">
+                    <span id="userDisplay" class="text-gray-400 text-sm"></span>
+                    <button onclick="logout()" id="logoutBtn" class="hidden ml-4 px-3 py-2 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page hidden">
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-white mb-2">Dashboard</h1>
+                <p class="text-gray-400">Selamat datang di FastAPI Application</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-200 text-sm">Users</p>
+                            <p class="text-3xl font-bold">-</p>
+                        </div>
+                        <i class="fas fa-users text-4xl opacity-20"></i>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-green-600 to-green-700 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-200 text-sm">Items</p>
+                            <p class="text-3xl font-bold" id="itemCount">0</p>
+                        </div>
+                        <i class="fas fa-box text-4xl opacity-20"></i>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-200 text-sm">Status</p>
+                            <p class="text-3xl font-bold">Active</p>
+                        </div>
+                        <i class="fas fa-check-circle text-4xl opacity-20"></i>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-orange-600 to-orange-700 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-200 text-sm">Version</p>
+                            <p class="text-3xl font-bold">1.0</p>
+                        </div>
+                        <i class="fas fa-code-branch text-4xl opacity-20"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 hover:border-purple-500 transition cursor-pointer" onclick="showPage('auth')">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-user-plus text-purple-400 text-2xl mr-3"></i>
+                        <h3 class="text-white font-semibold">Register</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Buat akun user baru dengan aman</p>
+                    <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg transition">Mulai</button>
+                </div>
+
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 hover:border-blue-500 transition cursor-pointer" onclick="showPage('items')">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-cube text-blue-400 text-2xl mr-3"></i>
+                        <h3 class="text-white font-semibold">Kelola Items</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">CRUD penuh untuk item/produk</p>
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition">Mulai</button>
+                </div>
+
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 hover:border-green-500 transition cursor-pointer" onclick="showPage('predict')">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-robot text-green-400 text-2xl mr-3"></i>
+                        <h3 class="text-white font-semibold">Prediksi</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Prediksi penjualan dengan ML</p>
+                    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition">Mulai</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auth Page -->
+        <div id="auth" class="page hidden">
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-white mb-2">Authentication</h1>
+                <p class="text-gray-400">Register dan Login ke aplikasi</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Register Form -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-8 shadow-lg">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-user-plus text-purple-400 text-2xl mr-3"></i>
+                        <h2 class="text-2xl font-bold text-white">Register</h2>
+                    </div>
+
+                    <div id="registerAlert" class="mb-4 p-4 rounded-lg hidden"></div>
+
+                    <form id="registerForm" class="space-y-4">
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2">Username</label>
+                            <input type="text" id="regUsername" required placeholder="username" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2">Email</label>
+                            <input type="email" id="regEmail" required placeholder="email@example.com" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2">Full Name</label>
+                            <input type="text" id="regFullName" placeholder="John Doe" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2">Password</label>
+                            <input type="password" id="regPassword" required placeholder="password123" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition">
+                        </div>
+                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition">Register</button>
+                    </form>
+                </div>
+
+                <!-- Login Form -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-8 shadow-lg">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-sign-in-alt text-blue-400 text-2xl mr-3"></i>
+                        <h2 class="text-2xl font-bold text-white">Login</h2>
+                    </div>
+
+                    <div id="loginAlert" class="mb-4 p-4 rounded-lg hidden"></div>
+
+                    <form id="loginForm" class="space-y-4">
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2">Username</label>
+                            <input type="text" id="loginUsername" required placeholder="username" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2">Password</label>
+                            <input type="password" id="loginPassword" required placeholder="password123" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition">Login</button>
+                    </form>
+
+                    <div id="tokenDisplay" class="mt-6 hidden">
+                        <div class="bg-yellow-900 border border-yellow-700 rounded-lg p-4">
+                            <p class="text-yellow-300 text-sm font-medium mb-2">Access Token:</p>
+                            <p id="tokenValue" class="text-yellow-100 text-xs font-mono break-all"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Get User Section -->
+            <div class="mt-8 bg-slate-800 border border-slate-700 rounded-lg p-8 shadow-lg">
+                <div class="flex items-center mb-6">
+                    <i class="fas fa-user text-green-400 text-2xl mr-3"></i>
+                    <h2 class="text-2xl font-bold text-white">Get User</h2>
+                </div>
+
+                <div id="getUserAlert" class="mb-4 p-4 rounded-lg hidden"></div>
+
+                <form id="getUserForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-gray-300 text-sm font-medium mb-2">Username</label>
+                        <input type="text" id="getUsername" required placeholder="username" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 transition">
+                    </div>
+                    <button type="submit" class="md:mt-8 bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg transition">Get User</button>
+                </form>
+
+                <div id="userResponse" class="hidden mt-4">
+                    <pre id="userResponseContent" class="bg-slate-900 border border-slate-700 rounded-lg p-4 text-gray-300 text-sm overflow-x-auto"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Page -->
+        <div id="items" class="page hidden">
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-white mb-2">Item Management</h1>
+                <p class="text-gray-400">Kelola items/produk Anda</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Create Item Form -->
+                <div class="lg:col-span-1">
+                    <div class="bg-slate-800 border border-slate-700 rounded-lg p-8 shadow-lg sticky top-24">
+                        <div class="flex items-center mb-6">
+                            <i class="fas fa-plus-circle text-purple-400 text-2xl mr-3"></i>
+                            <h2 class="text-2xl font-bold text-white">Create Item</h2>
+                        </div>
+
+                        <div id="createItemAlert" class="mb-4 p-4 rounded-lg hidden"></div>
+
+                        <form id="createItemForm" class="space-y-4">
+                            <div>
+                                <label class="block text-gray-300 text-sm font-medium mb-2">Item Name</label>
+                                <input type="text" id="itemName" required placeholder="Product name" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition">
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 text-sm font-medium mb-2">Description</label>
+                                <textarea id="itemDescription" placeholder="Product description" rows="3" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 text-sm font-medium mb-2">Price</label>
+                                <input type="number" id="itemPrice" required placeholder="0.00" step="0.01" min="0" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition">
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="itemAvailable" checked class="w-4 h-4 text-purple-600 rounded">
+                                <label for="itemAvailable" class="ml-2 text-gray-300">Available</label>
+                            </div>
+                            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition">Create Item</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Items List & Update -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Items List -->
+                    <div class="bg-slate-800 border border-slate-700 rounded-lg p-8 shadow-lg">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center">
+                                <i class="fas fa-list text-blue-400 text-2xl mr-3"></i>
+                                <h2 class="text-2xl font-bold text-white">Items List</h2>
+                            </div>
+                            <button onclick="getItems()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">Refresh</button>
+                        </div>
+
+                        <div id="getItemsAlert" class="mb-4 p-4 rounded-lg hidden"></div>
+
+                        <div id="itemsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Items will be displayed here -->
+                        </div>
+                    </div>
+
+                    <!-- Update/Delete Item -->
+                    <div class="bg-slate-800 border border-slate-700 rounded-lg p-8 shadow-lg">
+                        <div class="flex items-center mb-6">
+                            <i class="fas fa-edit text-orange-400 text-2xl mr-3"></i>
+                            <h2 class="text-2xl font-bold text-white">Update/Delete Item</h2>
+                        </div>
+
+                        <div id="updateItemAlert" class="mb-4 p-4 rounded-lg hidden"></div>
+
+                        <form id="updateItemForm" class="space-y-4">
+                            <div>
+                                <label class="block text-gray-300 text-sm font-medium mb-2">Item ID</label>
+                                <input type="text" id="updateItemId" required placeholder="Item UUID" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-300 text-sm font-medium mb-2">Item Name (optional)</label>
+                                    <input type="text" id="updateItemName" placeholder="Leave empty to keep" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-300 text-sm font-medium mb-2">Price (optional)</label>
+                                    <input type="number" id="updateItemPrice" placeholder="Leave empty to keep" step="0.01" min="0" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 transition">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 rounded-lg transition">Update Item</button>
+                                <button type="button" onclick="deleteItem()" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-lg transition">Delete Item</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predict Page -->
+        <div id="predict" class="page hidden">
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-white mb-2">Sales Prediction</h1>
+                <p class="text-gray-400">Prediksi penjualan dengan machine learning</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Prediction Form -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-8 shadow-lg">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-magic text-green-400 text-2xl mr-3"></i>
+                        <h2 class="text-2xl font-bold text-white">Input Features</h2>
+                    </div>
+
+                    <div class="bg-blue-900 border border-blue-700 rounded-lg p-4 mb-6">
+                        <p class="text-blue-200 text-sm">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Anda harus login terlebih dahulu untuk menggunakan fitur ini.
+                        </p>
+                    </div>
+
+                    <div id="predictionAlert" class="mb-4 p-4 rounded-lg hidden"></div>
+
+                    <form id="predictionForm" class="space-y-4">
+                        <div>
+                            <label class="block text-gray-300 text-sm font-medium mb-2">Features (comma-separated)</label>
+                            <textarea id="predictionFeatures" required placeholder="e.g., 50.0, 100.0, 25.5" rows="4" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-green-500 transition font-mono text-sm"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg transition">Predict Sales</button>
+                    </form>
+                </div>
+
+                <!-- Prediction Result -->
+                <div class="bg-slate-800 border border-slate-700 rounded-lg p-8 shadow-lg">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-chart-line text-orange-400 text-2xl mr-3"></i>
+                        <h2 class="text-2xl font-bold text-white">Prediction Result</h2>
+                    </div>
+
+                    <div id="predictionResponse" class="hidden">
+                        <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                            <pre id="predictionResponseContent" class="text-gray-300 text-sm overflow-x-auto font-mono"></pre>
+                        </div>
+                    </div>
+
+                    <div id="noPredictionMessage" class="text-center py-8">
+                        <i class="fas fa-chart-pie text-4xl text-gray-500 mb-4"></i>
+                        <p class="text-gray-400">Prediksi akan muncul di sini</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ML Model Info -->
+            <div class="mt-8 bg-slate-800 border border-slate-700 rounded-lg p-8 shadow-lg">
+                <div class="flex items-center mb-6">
+                    <i class="fas fa-brain text-purple-400 text-2xl mr-3"></i>
+                    <h2 class="text-2xl font-bold text-white">Machine Learning Model</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-slate-700 rounded-lg p-4">
+                        <p class="text-gray-400 text-sm">Model Type</p>
+                        <p class="text-white font-semibold">Linear Regression</p>
+                    </div>
+                    <div class="bg-slate-700 rounded-lg p-4">
+                        <p class="text-gray-400 text-sm">Dataset Size</p>
+                        <p class="text-white font-semibold">1000 samples</p>
+                    </div>
+                    <div class="bg-slate-700 rounded-lg p-4">
+                        <p class="text-gray-400 text-sm">Training Split</p>
+                        <p class="text-white font-semibold">80/20</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast" class="fixed bottom-4 right-4 hidden"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let currentToken = localStorage.getItem('access_token') || null;
+        let currentUser = localStorage.getItem('username') || null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('dashboard');
+            updateUserDisplay();
+            if (currentToken) {
+                getItems();
+            }
+        });
+
+        // Event Listeners
+        document.getElementById('registerForm').addEventListener('submit', handleRegister);
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        document.getElementById('getUserForm').addEventListener('submit', handleGetUser);
+        document.getElementById('createItemForm').addEventListener('submit', handleCreateItem);
+        document.getElementById('updateItemForm').addEventListener('submit', handleUpdateItem);
+        document.getElementById('predictionForm').addEventListener('submit', handlePrediction);
+
+        // Page Management
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(pageName).classList.remove('hidden');
+        }
+
+        // Auth Handlers
+        async function handleRegister(e) {
+            e.preventDefault();
+            const alert = document.getElementById('registerAlert');
+            
+            const data = {
+                username: document.getElementById('regUsername').value,
+                email: document.getElementById('regEmail').value,
+                full_name: document.getElementById('regFullName').value,
+                password: document.getElementById('regPassword').value
+            };
+
+            try {
+                showAlertMessage(alert, 'Loading...', 'info');
+                const response = await fetch(`${API_BASE}/users/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlertMessage(alert, `✅ User ${data.username} berhasil didaftarkan!`, 'success');
+                    showToast(`User ${data.username} registered`, 'success');
+                    document.getElementById('registerForm').reset();
+                } else {
+                    showAlertMessage(alert, `❌ ${result.detail || 'Error'}`, 'error');
+                    showToast('Registration failed', 'error');
+                }
+            } catch (error) {
+                showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const alert = document.getElementById('loginAlert');
+            
+            const formData = new FormData();
+            formData.append('username', document.getElementById('loginUsername').value);
+            formData.append('password', document.getElementById('loginPassword').value);
+
+            try {
+                showAlertMessage(alert, 'Loading...', 'info');
+                const response = await fetch(`${API_BASE}/token`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentToken = result.access_token;
+                    currentUser = document.getElementById('loginUsername').value;
+                    localStorage.setItem('access_token', currentToken);
+                    localStorage.setItem('username', currentUser);
+                    displayToken(currentToken);
+                    updateUserDisplay();
+                    showAlertMessage(alert, '✅ Login berhasil!', 'success');
+                    showToast(`Welcome ${currentUser}!`, 'success');
+                    document.getElementById('loginForm').reset();
+                } else {
+                    showAlertMessage(alert, `❌ ${result.detail || 'Login gagal'}`, 'error');
+                    showToast('Login failed', 'error');
+                }
+            } catch (error) {
+                showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function handleGetUser(e) {
+            e.preventDefault();
+            const alert = document.getElementById('getUserAlert');
+            const username = document.getElementById('getUsername').value;
+
+            try {
+                showAlertMessage(alert, 'Loading...', 'info');
+                const response = await fetch(`${API_BASE}/users/${username}`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlertMessage(alert, '', 'info');
+                    document.getElementById('userResponse').classList.remove('hidden');
+                    document.getElementById('userResponseContent').textContent = JSON.stringify(result, null, 2);
+                    showToast('User found', 'success');
+                } else {
+                    showAlertMessage(alert, `❌ ${result.detail || 'User tidak ditemukan'}`, 'error');
+                    document.getElementById('userResponse').classList.add('hidden');
+                    showToast('User not found', 'error');
+                }
+            } catch (error) {
+                showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Item Handlers
+        async function handleCreateItem(e) {
+            e.preventDefault();
+            const alert = document.getElementById('createItemAlert');
+            
+            const data = {
+                name: document.getElementById('itemName').value,
+                description: document.getElementById('itemDescription').value,
+                price: parseFloat(document.getElementById('itemPrice').value),
+                available: document.getElementById('itemAvailable').checked
+            };
+
+            try {
+                showAlertMessage(alert, 'Loading...', 'info');
+                const response = await fetch(`${API_BASE}/items/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlertMessage(alert, `✅ Item "${data.name}" berhasil dibuat!`, 'success');
+                    showToast('Item created', 'success');
+                    document.getElementById('createItemForm').reset();
+                    getItems();
+                } else {
+                    showAlertMessage(alert, `❌ ${result.detail || 'Error'}`, 'error');
+                    showToast('Failed to create item', 'error');
+                }
+            } catch (error) {
+                showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function getItems() {
+            const alert = document.getElementById('getItemsAlert');
+            const listContainer = document.getElementById('itemsList');
+            
+            try {
+                showAlertMessage(alert, 'Loading...', 'info');
+                const response = await fetch(`${API_BASE}/items/`);
+                const items = await response.json();
+                
+                if (response.ok) {
+                    showAlertMessage(alert, '', 'info');
+                    listContainer.innerHTML = '';
+                    
+                    if (items.length === 0) {
+                        listContainer.innerHTML = '<p class="col-span-2 text-center text-gray-400">Tidak ada item.</p>';
+                        document.getElementById('itemCount').textContent = '0';
+                    } else {
+                        document.getElementById('itemCount').textContent = items.length;
+                        items.forEach(item => {
+                            const card = document.createElement('div');
+                            card.className = 'bg-slate-700 border border-slate-600 rounded-lg p-4 hover:border-blue-500 transition';
+                            card.innerHTML = `
+                                <h4 class="text-white font-semibold mb-2">${item.name}</h4>
+                                <p class="text-gray-400 text-xs mb-1"><strong>ID:</strong> ${item.id.substring(0, 8)}...</p>
+                                <p class="text-gray-400 text-xs mb-1"><strong>Price:</strong> Rp ${item.price.toLocaleString('id-ID')}</p>
+                                <p class="text-gray-400 text-xs mb-3"><strong>Status:</strong> ${item.available ? '✅ Available' : '❌ Not Available'}</p>
+                                <button onclick="copyToField('${item.id}')" class="w-full bg-slate-600 hover:bg-slate-500 text-white text-xs py-1 rounded transition">
+                                    <i class="fas fa-copy mr-1"></i>Copy ID
+                                </button>
+                            `;
+                            listContainer.appendChild(card);
+                        });
+                    }
+                    showAlertMessage(alert, `✅ ${items.length} items loaded`, 'success');
+                } else {
+                    showAlertMessage(alert, `❌ ${items.detail || 'Error'}`, 'error');
+                }
+            } catch (error) {
+                showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function handleUpdateItem(e) {
+            e.preventDefault();
+            const alert = document.getElementById('updateItemAlert');
+            const itemId = document.getElementById('updateItemId').value;
+            
+            const data = {};
+            if (document.getElementById('updateItemName').value) {
+                data.name = document.getElementById('updateItemName').value;
+            }
+            if (document.getElementById('updateItemPrice').value) {
+                data.price = parseFloat(document.getElementById('updateItemPrice').value);
+            }
+
+            try {
+                showAlertMessage(alert, 'Loading...', 'info');
+                const response = await fetch(`${API_BASE}/items/${itemId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlertMessage(alert, '✅ Item berhasil diupdate!', 'success');
+                    showToast('Item updated', 'success');
+                    document.getElementById('updateItemForm').reset();
+                    getItems();
+                } else {
+                    showAlertMessage(alert, `❌ ${result.detail || 'Error'}`, 'error');
+                    showToast('Failed to update item', 'error');
+                }
+            } catch (error) {
+                showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteItem() {
+            const alert = document.getElementById('updateItemAlert');
+            const itemId = document.getElementById('updateItemId').value;
+
+            if (!itemId) {
+                showAlertMessage(alert, '❌ Masukkan Item ID terlebih dahulu', 'error');
+                return;
+            }
+
+            if (!confirm('Anda yakin ingin menghapus item ini?')) {
+                return;
+            }
+
+            try {
+                showAlertMessage(alert, 'Loading...', 'info');
+                const response = await fetch(`${API_BASE}/items/${itemId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlertMessage(alert, '✅ Item berhasil dihapus!', 'success');
+                    showToast('Item deleted', 'success');
+                    document.getElementById('updateItemForm').reset();
+                    getItems();
+                } else {
+                    const result = await response.json();
+                    showAlertMessage(alert, `❌ ${result.detail || 'Error'}`, 'error');
+                    showToast('Failed to delete item', 'error');
+                }
+            } catch (error) {
+                showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Prediction Handler
+        async function handlePrediction(e) {
+            e.preventDefault();
+            const alert = document.getElementById('predictionAlert');
+
+            if (!currentToken) {
+                showAlertMessage(alert, '❌ Anda harus login terlebih dahulu', 'error');
+                showToast('Login required', 'error');
+                return;
+            }
+
+            const featuresStr = document.getElementById('predictionFeatures').value;
+            const features = featuresStr.split(',').map(f => parseFloat(f.trim()));
+
+            if (features.some(isNaN)) {
+                showAlertMessage(alert, '❌ Input features tidak valid', 'error');
+                showToast('Invalid features format', 'error');
+                return;
+            }
+
+            try {
+                showAlertMessage(alert, 'Loading...', 'info');
+                const response = await fetch(`${API_BASE}/predict-sales/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify(features)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlertMessage(alert, '✅ Prediksi berhasil!', 'success');
+                    document.getElementById('predictionResponse').classList.remove('hidden');
+                    document.getElementById('noPredictionMessage').classList.add('hidden');
+                    document.getElementById('predictionResponseContent').textContent = JSON.stringify(result, null, 2);
+                    showToast('Prediction generated', 'success');
+                } else {
+                    showAlertMessage(alert, `❌ ${result.detail || 'Error'}`, 'error');
+                    showToast('Prediction failed', 'error');
+                }
+            } catch (error) {
+                showAlertMessage(alert, `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Helper Functions
+        function showAlertMessage(element, message, type) {
+            element.textContent = message;
+            const classes = {
+                success: 'bg-green-900 border border-green-700 text-green-300',
+                error: 'bg-red-900 border border-red-700 text-red-300',
+                info: 'bg-blue-900 border border-blue-700 text-blue-300'
+            };
+            element.className = `${classes[type]} p-4 rounded-lg slide-up`;
+        }
+
+        function displayToken(token) {
+            const display = document.getElementById('tokenDisplay');
+            const value = document.getElementById('tokenValue');
+            value.textContent = token;
+            display.classList.remove('hidden');
+        }
+
+        function updateUserDisplay() {
+            const userDisplay = document.getElementById('userDisplay');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            if (currentUser) {
+                userDisplay.textContent = `Welcome, ${currentUser}`;
+                logoutBtn.classList.remove('hidden');
+            } else {
+                userDisplay.textContent = 'Not logged in';
+                logoutBtn.classList.add('hidden');
+            }
+        }
+
+        function logout() {
+            currentToken = null;
+            currentUser = null;
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('username');
+            updateUserDisplay();
+            showPage('dashboard');
+            showToast('Logged out successfully', 'success');
+        }
+
+        function copyToField(id) {
+            document.getElementById('updateItemId').value = id;
+            showToast('ID copied to field', 'success');
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.className = 'fixed bottom-4 right-4 slide-up';
+            const colors = {
+                success: 'bg-green-600',
+                error: 'bg-red-600',
+                info: 'bg-blue-600'
+            };
+            toast.innerHTML = `
+                <div class="${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+    </script>
+</body>
+</html>

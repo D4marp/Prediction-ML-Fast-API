@@ -4,4 +4,4 @@ pyjwt
 passlib[bcrypt]
 sqlalchemy
 python-multipart
-sckit-learn
+scikit-learn

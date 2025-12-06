@@ -1,8 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException, status, Body
+from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from datetime import timedelta
 from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+import os
 from app.security.flowOauth import (
     Token,
     ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -43,10 +46,49 @@ add_middlewares(app)
 # Add logging middleware
 app.add_middleware(BaseHTTPMiddleware, dispatch=log_request_response)
 
+# Serve static files
+static_path = os.path.join(os.path.dirname(__file__), 'static')
+if os.path.exists(static_path):
+    app.mount("/static", StaticFiles(directory=static_path), name="static")
+
 # Include routers
 app.include_router(items_router)
 app.include_router(users_router)
 app.include_router(predict_sales_router)
+
+@app.get("/", tags=["Root"], response_class=HTMLResponse)
+async def root():
+    """
+    Root endpoint that serves the UI.
+
+    Returns:
+        HTMLResponse: The main UI page.
+    """
+    static_path = os.path.join(os.path.dirname(__file__), 'static', 'index.html')
+    if os.path.exists(static_path):
+        with open(static_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    return """
+    <html>
+        <head>
+            <title>FastAPI UI</title>
+        </head>
+        <body>
+            <h1>Welcome to FastAPI Application</h1>
+            <p>API documentation: <a href="/docs">Swagger UI</a> or <a href="/redoc">ReDoc</a></p>
+        </body>
+    </html>
+    """
+
+@app.get("/favicon.ico", tags=["Assets"])
+async def favicon():
+    """
+    Favicon endpoint that returns a simple favicon.ico response.
+    
+    Returns:
+        JSONResponse: A simple response to prevent 404 errors.
+    """
+    return JSONResponse(content=None, status_code=204)  # No Content
 
 @app.post("/token", response_model=Token)
 async def login_for_access_token(

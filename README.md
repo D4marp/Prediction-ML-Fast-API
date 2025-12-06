@@ -68,13 +68,9 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 
 ## Usage (Example)
-
 1. Access the API documentation:
 Swagger UI: http://127.0.0.1:8000/docs
 ReDoc: http://127.0.0.1:8000/redoc
-
-
-
 2. Example Usage (curl)
 Create a User:
 curl -X POST "http://127.0.0.1:8000/users/" -H "Content-Type: application/json" -d '{
@@ -83,16 +79,13 @@ curl -X POST "http://127.0.0.1:8000/users/" -H "Content-Type: application/json" 
     "full_name": "John Doe",
     "password": "securepassword123"
 }'
-
 3. Predict Sales:
 curl -X POST "http://127.0.0.1:8000/predict-sales/" -H "Authorization: Bearer <access_token>" -H "Content-Type: application/json" -d '{
     "features": [50.0]
 }'
 
 ## License and Contributiong
-
 1. License
 This project is licensed under the MIT License. See the LICENSE file for details.
-
 2. Contributing
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
