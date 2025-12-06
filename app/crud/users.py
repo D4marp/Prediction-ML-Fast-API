@@ -5,8 +5,8 @@ from app.database.sqlmodels import User as SQLUser
 from passlib.context import CryptContext
 from fastapi import HTTPException
 
-# Configure password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Configure password hashing with argon2
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 def create_user(db: Session, user: UserCreate):
     """

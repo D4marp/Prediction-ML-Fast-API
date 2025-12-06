@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator
 from uuid import UUID, uuid4
 from typing import Optional
 
@@ -94,9 +94,19 @@ class UserCreate(UserBase):
         UserBase: Includes all fields from the base model.
 
     Attributes:
-        password (str): The password for the new user.
+        password (str): The password for the new user (max 72 bytes for bcrypt).
     """
-    password: str
+    password: str = Field(..., min_length=8, max_length=72, title="User Password")
+
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v):
+        """Validate password length for bcrypt compatibility."""
+        if len(v.encode('utf-8')) > 72:
+            raise ValueError('Password must not exceed 72 bytes')
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters')
+        return v
 
 
 class UserUpdate(BaseModel):

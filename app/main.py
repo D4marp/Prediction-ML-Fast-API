@@ -86,9 +86,10 @@ async def favicon():
     Favicon endpoint that returns a simple favicon.ico response.
     
     Returns:
-        JSONResponse: A simple response to prevent 404 errors.
+        Response: A 204 No Content response to prevent 404 errors.
     """
-    return JSONResponse(content=None, status_code=204)  # No Content
+    from starlette.responses import Response
+    return Response(status_code=204)
 
 @app.post("/token", response_model=Token)
 async def login_for_access_token(

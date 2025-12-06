@@ -13,7 +13,9 @@ def add_middlewares(app: FastAPI):
     """
     # Define allowed origins for CORS
     allowed_origins = [
-        "http://localhost:7000",  # Allow access only from localhost on port 7000
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "http://localhost:7000",
     ]
 
     # Add CORS middleware
